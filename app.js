@@ -64,6 +64,10 @@ class App {
   constructor() {
     // Get user's position
     this._getPosition();
+
+    // Get data from local storage
+    this._getLocalStorage();
+
     //Event handlers
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElv.bind);
@@ -91,6 +95,10 @@ class App {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
     this.#map.on('click', this._showForm.bind(this));
+
+    this.#workouts.forEach(work => {
+      this._renderWorkoutMarker(work);
+    });
   }
 
   _showForm(mapE) {
@@ -162,6 +170,8 @@ class App {
 
     // Hide form +clear input fields
     this._hideForm();
+    // Local storage
+    this._setLocalStorage();
   }
 
   _renderWorkoutMarker(workout) {
@@ -244,6 +254,21 @@ class App {
       pan: {
         duration: 1,
       },
+    });
+  }
+  _setLocalStorage() {
+    localStorage.setItem('workout', JSON.stringify(this.#workouts));
+  }
+
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('workout'));
+
+    if (!data) return;
+
+    this.#workouts = data;
+
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work);
     });
   }
 }
